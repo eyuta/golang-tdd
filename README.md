@@ -39,9 +39,20 @@ TDD のリズム
 
 #### 第 1 章 仮実装
 
+第 1 章振り返り
+
+> - 書くべきテストのリストを作った。
+> - どうなったら嬉しいかを小さいテストコードで表現した。
+> - 空実装を使ってコンパイラを通した。
+> - 大罪を犯しながらテストを通した。
+> - 動くコードをだんだんと共通化し、ベタ書きの値を変数に置き換えていった。
+> - TODO リストに項目を追加するに留め、一度に多くのものを相手にすることを避けた。
+
+現状の TODO リスト
+
 > - [ ] $5+10CHF=$10（レートが 2:1 の場合）
 > - [x] $5\*2=$10
-> - [ ] amount を private にする
+> - [x] amount を private にする
 > - [ ] Dollar の副作用どうする？
 > - [ ] Money の丸め処理どうする？
 
@@ -67,9 +78,17 @@ func TestMultiCurrencyMoney(t *testing.T) {
 
 #### 第 2 章 明確な実装
 
+第 2 章の振り返り
+
+> - 設計の問題点（今回は副作用）をテストコードに写し取り、その問題点のせいでテストが失敗するのを確認した。
+> - 空実装でさっさとコンパイルを通した。
+> - 正しいと思える実装をすぐに行い、テストを通した。
+
+現状の TODO リスト
+
 > - [ ] $5+10CHF=$10（レートが 2:1 の場合）
 > - [x] $5\*2=$10
-> - [ ] amount を private にする
+> - [x] amount を private にする
 > - [x] Dollar の副作用どうする？
 > - [ ] Money の丸め処理どうする？
 
@@ -97,9 +116,19 @@ func TestMultiCurrencyMoney(t *testing.T) {
 
 #### 第 3 章 三角測量
 
+第 3 章の振り返り
+
+> Value Object パターンを満たす条件がわかった。
+> その条件を満たすテストを書いた。
+> シンプルな実装を行った。
+> すぐにリファクタリングを行うのではなく、もう 1 つテストを書いた。
+> 2 つのテストを同時に通すリファクタリングを行った。
+
+現状の TODO リスト
+
 > - [ ] $5+10CHF=$10（レートが 2:1 の場合）
 > - [x] $5\*2=$10
-> - [ ] amount を private にする
+> - [x] amount を private にする
 > - [x] Dollar の副作用どうする？
 > - [ ] Money の丸め処理どうする？
 > - [x] equals()
@@ -140,6 +169,38 @@ func TestMultiCurrencyMoney(t *testing.T) {
 	})
 }
 ```
+
+#### 第 4 章 意図を語るテスト
+
+第 4 章の振り返り
+
+> 作成したばかりの機能を使って、テストを改善した。
+> そもそも正しく検証できていないテストが 2 つあったら、もはやお手上げだと気づいた。
+> そのようなリスクを受け入れて先に進んだ。
+> テスト対象オブジェクトの新しい機能を使い、テストコードとプロダクトコードの間の結合度を下げた。
+
+```multiCurrencyMoney.go
+// 変化なし
+```
+
+```multiCurrencyMoney_test.go
+func TestMultiCurrencyMoney(t *testing.T) {
+	t.Run("ドルの掛け算が可能である", func(t *testing.T) {
+		five := Dollar{5}
+		assert.Equal(t, Dollar{10}, five.times(2))
+		assert.Equal(t, Dollar{15}, five.times(3))
+	})
+
+	t.Run("同じ金額が等価である", func(t *testing.T) {
+		assert.True(t, Dollar{5}.equals(Dollar{5}))
+		assert.False(t, Dollar{5}.equals(Dollar{6}))
+	})
+}
+```
+
+#### 第 5 章 原則をあえて破るとき
+
+
 ### 第 II 部「xUnit」
 
 ### 第 III 部「テスト駆動開発のパターン」
