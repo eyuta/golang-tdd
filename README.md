@@ -39,6 +39,12 @@ TDD のリズム
 
 #### 第 1 章 仮実装
 
+> - [ ] $5+10CHF=$10（レートが 2:1 の場合）
+> - [x] $5\*2=$10
+> - [ ] amount を private にする
+> - [ ] Dollar の副作用どうする？
+> - [ ] Money の丸め処理どうする？
+
 ```multiCurrencyMoney.go
 type Dollar struct {
 	amount int
@@ -61,6 +67,34 @@ func TestMultiCurrencyMoney(t *testing.T) {
 
 #### 第 2 章 明確な実装
 
+> - [ ] $5+10CHF=$10（レートが 2:1 の場合）
+> - [x] $5\*2=$10
+> - [ ] amount を private にする
+> - [x] Dollar の副作用どうする？
+> - [ ] Money の丸め処理どうする？
+
+```multiCurrencyMoney.go
+type Dollar struct {
+	amount int
+}
+
+func (d *Dollar) times(multiplier int) Dollar {
+	return Dollar{d.amount * multiplier}
+}
+```
+
+```multiCurrencyMoney_test.go
+func TestMultiCurrencyMoney(t *testing.T) {
+	t.Run("何度でもドルの掛け算が可能である", func(t *testing.T) {
+		five := Dollar{5}
+		product := five.times(2)
+		assert.Equal(t, 10, product.amount)
+		product = five.times(3)
+		assert.Equal(t, 15, product.amount)
+	})
+}
+```
+#### 第3章 三角測量
 ### 第 II 部「xUnit」
 
 ### 第 III 部「テスト駆動開発のパターン」
