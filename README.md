@@ -264,6 +264,10 @@ func (f Franc) equals(object Object) bool {
 		assert.Equal(t, Franc{10}, five.times(2))
 		assert.Equal(t, Franc{15}, five.times(3))
 	})
+	t.Run("同じ金額のフランが等価である", func(t *testing.T) {
+		assert.True(t, Franc{5}.equals(Franc{5}))
+		assert.False(t, Franc{5}.equals(Franc{6}))
+	})
 ```
 
 #### 第 6 章 原則をあえて破るとき
