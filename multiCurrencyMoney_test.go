@@ -17,4 +17,10 @@ func TestMultiCurrencyMoney(t *testing.T) {
 		assert.True(t, Dollar{5}.equals(Dollar{5}))
 		assert.False(t, Dollar{5}.equals(Dollar{6}))
 	})
+
+	t.Run("フランの掛け算が可能である", func(t *testing.T) {
+		five := Franc{5}
+		assert.Equal(t, Franc{10}, five.times(2))
+		assert.Equal(t, Franc{15}, five.times(3))
+	})
 }

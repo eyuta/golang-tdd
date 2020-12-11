@@ -118,11 +118,11 @@ func TestMultiCurrencyMoney(t *testing.T) {
 
 第 3 章の振り返り
 
-> Value Object パターンを満たす条件がわかった。
-> その条件を満たすテストを書いた。
-> シンプルな実装を行った。
-> すぐにリファクタリングを行うのではなく、もう 1 つテストを書いた。
-> 2 つのテストを同時に通すリファクタリングを行った。
+> - Value Object パターンを満たす条件がわかった。
+> - その条件を満たすテストを書いた。
+> - シンプルな実装を行った。
+> - すぐにリファクタリングを行うのではなく、もう 1 つテストを書いた。
+> - 2 つのテストを同時に通すリファクタリングを行った。
 
 現状の TODO リスト
 
@@ -174,10 +174,10 @@ func TestMultiCurrencyMoney(t *testing.T) {
 
 第 4 章の振り返り
 
-> 作成したばかりの機能を使って、テストを改善した。
-> そもそも正しく検証できていないテストが 2 つあったら、もはやお手上げだと気づいた。
-> そのようなリスクを受け入れて先に進んだ。
-> テスト対象オブジェクトの新しい機能を使い、テストコードとプロダクトコードの間の結合度を下げた。
+> - 作成したばかりの機能を使って、テストを改善した。
+> - そもそも正しく検証できていないテストが 2 つあったら、もはやお手上げだと気づいた。
+> - そのようなリスクを受け入れて先に進んだ。
+> - テスト対象オブジェクトの新しい機能を使い、テストコードとプロダクトコードの間の結合度を下げた。
 
 ```multiCurrencyMoney.go
 // 変化なし
@@ -200,6 +200,86 @@ func TestMultiCurrencyMoney(t *testing.T) {
 
 #### 第 5 章 原則をあえて破るとき
 
+第 5 章の振り返り
+
+> - 大きいテストに立ち向かうにはまだ早かったので、次の一歩を進めるために小さなテストをひねり出した。
+> - 恥知らずにも既存のテストをコピー&ペーストして、テストを作成した。
+> - さらに恥知らずにも、既存のモデルコードを丸ごとコピー&ペーストして、テストを通した。
+> - この重複を排除するまでは家に帰らないと心に決めた。
+
+
+現状の TODO リスト
+
+> - [ ] $5+10CHF=$10（レートが 2:1 の場合）
+> - [x] $5\*2=$10
+> - [x] amount を private にする
+> - [x] Dollar の副作用どうする？
+> - [ ] Money の丸め処理どうする？
+> - [x] equals()
+> - [ ] hashCode()
+> - [ ] null との等価性比較
+> - [ ] 他のオブジェクトとの等価性比較
+> - [x] 5CHF*2=10CHF
+> - [ ] DollarとFrancの重複
+> - [ ] equalsの一般化
+> - [ ] timesの一般化
+
+```multiCurrencyMoney.go
+
+type Franc struct {
+	amount int
+}
+
+func (f Franc) times(multiplier int) Franc {
+	return Franc{f.amount * multiplier}
+}
+
+func (f Franc) equals(object Object) bool {
+	franc := object.(Franc)
+	return f.amount == franc.amount
+}
+```
+
+```multiCurrencyMoney_test.go
+	t.Run("フランの掛け算が可能である", func(t *testing.T) {
+		five := Franc{5}
+		assert.Equal(t, Franc{10}, five.times(2))
+		assert.Equal(t, Franc{15}, five.times(3))
+	})
+```
+#### 第 6 章 原則をあえて破るとき
+
+第 6 章の振り返り
+
+> - 大きいテストに立ち向かうにはまだ早かったので、次の一歩を進めるために小さなテストをひねり出した。
+> - 恥知らずにも既存のテストをコピー&ペーストして、テストを作成した。
+> - さらに恥知らずにも、既存のモデルコードを丸ごとコピー&ペーストして、テストを通した。
+> - この重複を排除するまでは家に帰らないと心に決めた。
+
+
+現状の TODO リスト
+
+> - [ ] $5+10CHF=$10（レートが 2:1 の場合）
+> - [x] $5\*2=$10
+> - [x] amount を private にする
+> - [x] Dollar の副作用どうする？
+> - [ ] Money の丸め処理どうする？
+> - [x] equals()
+> - [ ] hashCode()
+> - [ ] null との等価性比較
+> - [ ] 他のオブジェクトとの等価性比較
+> - [x] 5CHF*2=10CHF
+> - [ ] DollarとFrancの重複
+> - [ ] equalsの一般化
+> - [ ] timesの一般化
+
+```multiCurrencyMoney.go
+
+```
+
+```multiCurrencyMoney_test.go
+
+```
 
 ### 第 II 部「xUnit」
 
