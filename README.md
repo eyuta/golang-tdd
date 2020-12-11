@@ -94,7 +94,52 @@ func TestMultiCurrencyMoney(t *testing.T) {
 	})
 }
 ```
-#### 第3章 三角測量
+
+#### 第 3 章 三角測量
+
+> - [ ] $5+10CHF=$10（レートが 2:1 の場合）
+> - [x] $5\*2=$10
+> - [ ] amount を private にする
+> - [x] Dollar の副作用どうする？
+> - [ ] Money の丸め処理どうする？
+> - [x] equals()
+> - [ ] hashCode()
+> - [ ] null との等価性比較
+> - [ ] 他のオブジェクトとの等価性比較
+
+```multiCurrencyMoney.go
+type Object interface{}
+
+type Dollar struct {
+	amount int
+}
+
+func (d Dollar) times(multiplier int) Dollar {
+	return Dollar{d.amount * multiplier}
+}
+
+func (d Dollar) equals(object Object) bool {
+	dollar := object.(Dollar)
+	return d.amount == dollar.amount
+}
+```
+
+```multiCurrencyMoney_test.go
+func TestMultiCurrencyMoney(t *testing.T) {
+	t.Run("何度でもドルの掛け算が可能である", func(t *testing.T) {
+		five := Dollar{5}
+		product := five.times(2)
+		assert.Equal(t, 10, product.amount)
+		product = five.times(3)
+		assert.Equal(t, 15, product.amount)
+	})
+
+	t.Run("同じ金額が等価である", func(t *testing.T) {
+		assert.True(t, Dollar{5}.equals(Dollar{5}))
+		assert.False(t, Dollar{5}.equals(Dollar{6}))
+	})
+}
+```
 ### 第 II 部「xUnit」
 
 ### 第 III 部「テスト駆動開発のパターン」

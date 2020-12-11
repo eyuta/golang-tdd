@@ -14,4 +14,9 @@ func TestMultiCurrencyMoney(t *testing.T) {
 		product = five.times(3)
 		assert.Equal(t, 15, product.amount)
 	})
+
+	t.Run("同じ金額が等価である", func(t *testing.T) {
+		assert.True(t, Dollar{5}.equals(Dollar{5}))
+		assert.False(t, Dollar{5}.equals(Dollar{6}))
+	})
 }
