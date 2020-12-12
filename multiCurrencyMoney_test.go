@@ -8,24 +8,24 @@ import (
 
 func TestMultiCurrencyMoney(t *testing.T) {
 	t.Run("ドルの掛け算が可能である", func(t *testing.T) {
-		five := Dollar{5}
-		assert.Equal(t, Dollar{10}, five.times(2))
-		assert.Equal(t, Dollar{15}, five.times(3))
+		five := NewDollar(5)
+		assert.Equal(t, NewDollar(10), five.times(2))
+		assert.Equal(t, NewDollar(15), five.times(3))
 	})
 
 	t.Run("同じ金額のドルが等価である", func(t *testing.T) {
-		assert.True(t, Dollar{5}.equals(Dollar{5}))
-		assert.False(t, Dollar{5}.equals(Dollar{6}))
+		assert.True(t, NewDollar(5).equals(NewDollar(5)))
+		assert.False(t, NewDollar(5).equals(NewDollar(6)))
 	})
 
 	t.Run("フランの掛け算が可能である", func(t *testing.T) {
-		five := Franc{5}
-		assert.Equal(t, Franc{10}, five.times(2))
-		assert.Equal(t, Franc{15}, five.times(3))
+		five := NewFranc(5)
+		assert.Equal(t, NewFranc(10), five.times(2))
+		assert.Equal(t, NewFranc(15), five.times(3))
 	})
 
 	t.Run("同じ金額のフランが等価である", func(t *testing.T) {
-		assert.True(t, Franc{5}.equals(Franc{5}))
-		assert.False(t, Franc{5}.equals(Franc{6}))
+		assert.True(t, NewFranc(5).equals(NewFranc(5)))
+		assert.False(t, NewFranc(5).equals(NewFranc(6)))
 	})
 }

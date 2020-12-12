@@ -1,31 +1,45 @@
 package main
 
-type Object interface{}
+type AmountGetter interface {
+	getAmount() int
+}
+
+type Money struct {
+	amount int
+}
+
+func (m Money) equals(a AmountGetter) bool {
+	return m.getAmount() == a.getAmount()
+}
+
+func (m Money) getAmount() int {
+	return m.amount
+}
 
 type Dollar struct {
-	amount int
+	Money
+}
+
+// NewDollar is constructor of Dollar.
+func NewDollar(a int) Dollar {
+	return Dollar{Money{a}}
 }
 
 func (d Dollar) times(multiplier int) Dollar {
-	return Dollar{d.amount * multiplier}
-}
-
-func (d Dollar) equals(object Object) bool {
-	dollar := object.(Dollar)
-	return d.amount == dollar.amount
+	return NewDollar(d.amount * multiplier)
 }
 
 type Franc struct {
-	amount int
+	Money
+}
+
+// NewFranc is constructor of Dollar.
+func NewFranc(a int) Franc {
+	return Franc{Money{a}}
 }
 
 func (f Franc) times(multiplier int) Franc {
-	return Franc{f.amount * multiplier}
-}
-
-func (f Franc) equals(object Object) bool {
-	franc := object.(Franc)
-	return f.amount == franc.amount
+	return NewFranc(f.amount * multiplier)
 }
 
 func main() {}
