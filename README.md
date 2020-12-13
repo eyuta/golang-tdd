@@ -75,6 +75,8 @@ TDD のリズム
 > - [ ] Dollar の副作用どうする？
 > - [ ] Money の丸め処理どうする？
 
+##### 第 1 章終了時のコード
+
 ```multiCurrencyMoney.go
 type Dollar struct {
 	amount int
@@ -111,6 +113,8 @@ func TestMultiCurrencyMoney(t *testing.T) {
 > - [x] **Dollar の副作用どうする？**
 > - [ ] Money の丸め処理どうする？
 
+##### 第 2 章終了時のコード
+
 ```multiCurrencyMoney.go
 type Dollar struct {
 	amount int
@@ -135,6 +139,8 @@ func TestMultiCurrencyMoney(t *testing.T) {
 
 #### 第 3 章 三角測量
 
+型のコンバージョンは、[Type Assertion](https://go-tour-jp.appspot.com/methods/15)を利用した。
+
 ##### 第 3 章の振り返り
 
 > - Value Object パターンを満たす条件がわかった。
@@ -154,6 +160,8 @@ func TestMultiCurrencyMoney(t *testing.T) {
 > - [ ] hashCode()
 > - [ ] null との等価性比較
 > - [ ] 他のオブジェクトとの等価性比較
+
+##### 第 3 章終了時のコード
 
 ```multiCurrencyMoney.go
 type Object interface{}
@@ -197,6 +205,8 @@ func TestMultiCurrencyMoney(t *testing.T) {
 > - そもそも正しく検証できていないテストが 2 つあったら、もはやお手上げだと気づいた。
 > - そのようなリスクを受け入れて先に進んだ。
 > - テスト対象オブジェクトの新しい機能を使い、テストコードとプロダクトコードの間の結合度を下げた。
+
+##### 第 4 章終了時のコード
 
 ```multiCurrencyMoney.go
 // 変化なし
@@ -242,6 +252,8 @@ func TestMultiCurrencyMoney(t *testing.T) {
 > - [ ] equals の一般化
 > - [ ] times の一般化
 
+##### 第 5 章終了時のコード
+
 ```multiCurrencyMoney.go
 
 type Franc struct {
@@ -270,14 +282,24 @@ func (f Franc) equals(object Object) bool {
 	})
 ```
 
-#### 第 6 章 原則をあえて破るとき
+#### 第 6 章 テスト不足に気づいたら
+
+- Go には継承の概念が無いため、本章では [composition](https://www.geeksforgeeks.org/inheritance-in-golang/) を用いて実装する。
+- Dollar, Franc を生成するためのコンストラクタにあたるものを用意した(以下を参考にした)。
+  [Constructors and composite literals](https://golang.org/doc/effective_go.html#composite_literals)
+- `multiCurrencyMoney.go`を`money.go`, `dollar.go`, `franc.go`に分割した
+- `multiCurrencyMoney_test.go` を`money_test.go`に改名し、package 名を`money_test`とした
+- `money.go`と`money_test.go`の package 名が異なるため、プライベートメソッド(小文字のメソッド)が参照できなくなったので、`equals`, `times`メソッドをパブリックメソッドに変更した
+- パブリックメソッドにはコメントが必要になるので、簡単なコメントを追加した
+  参考: [Godoc: documenting Go code](https://blog.golang.org/godoc)
 
 ##### 第 6 章の振り返り
 
-> - 大きいテストに立ち向かうにはまだ早かったので、次の一歩を進めるために小さなテストをひねり出した。
-> - 恥知らずにも既存のテストをコピー&ペーストして、テストを作成した。
-> - さらに恥知らずにも、既存のモデルコードを丸ごとコピー&ペーストして、テストを通した。
-> - この重複を排除するまでは家に帰らないと心に決めた。
+このあたりから、言語仕様の違いによりコーディング内容が本と異なってくる
+
+> - Dollar クラスから親クラス Money へ段階的にメソッドを移動した。
+> - 2 つ目のクラス（Franc）も同様にサブクラス化した。
+> - 2 つの equals メソッドの差異をなくしてから、サブクラス側の実装を削除した。
 
 ##### 第 6 章の TODO リスト
 
@@ -292,15 +314,55 @@ func (f Franc) equals(object Object) bool {
 > - [ ] 他のオブジェクトとの等価性比較
 > - [x] 5CHF\*2=10CHF
 > - [ ] Dollar と Franc の重複
-> - [ ] equals の一般化
+> - [x] equals の一般化
 > - [ ] times の一般化
+> - [ ] Franc と Dollar を比較する
 
-```multiCurrencyMoney.go
+##### 第 6 章終了時のコード
 
+量が増えてきたので、主な変更点のみ抜粋して表示する
+全文: [github](https://github.com/eyuta/golang-tdd/tree/part1_chapter6)
+
+```money.go
+package money
+
+// AmountGetter is a wrapper of amount.
+type AmountGetter interface {
+	getAmount() int
+}
+
+// Money is a struct that handles money.
+type Money struct {
+	amount int
+}
+
+// Equals checks if the amount of the receiver and the argument are the same
+func (m Money) Equals(a AmountGetter) bool {
+	return m.getAmount() == a.getAmount()
+}
+
+func (m Money) getAmount() int {
+	return m.amount
+}
 ```
 
-```multiCurrencyMoney_test.go
+```money_test.go
+package money_test
 
+import (
+	"testing"
+
+	"github.com/eyuta/golang-tdd/money"
+	"github.com/stretchr/testify/assert"
+)
+
+func TestMultiCurrencyMoney(t *testing.T) {
+	t.Run("ドルの掛け算が可能である", func(t *testing.T) {
+		five := money.NewDollar(5)
+		assert.Equal(t, money.NewDollar(10), five.Times(2))
+		assert.Equal(t, money.NewDollar(15), five.Times(3))
+	})
+}
 ```
 
 ### 第 II 部「xUnit」
