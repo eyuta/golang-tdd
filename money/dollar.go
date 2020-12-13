@@ -7,7 +7,7 @@ type Dollar struct {
 
 // NewDollar is constructor of Dollar.
 func NewDollar(a int) Dollar {
-	return Dollar{Money{a}}
+	return Dollar{Money{amount: a, name: "Dollar"}}
 }
 
 // Times multiplies the amount of the receiver by a multiple of the argument

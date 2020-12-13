@@ -29,4 +29,8 @@ func TestMultiCurrencyMoney(t *testing.T) {
 		assert.True(t, money.NewFranc(5).Equals(money.NewFranc(5)))
 		assert.False(t, money.NewFranc(5).Equals(money.NewFranc(6)))
 	})
+
+	t.Run("同じ金額のドルとフランが等価ではない", func(t *testing.T) {
+		assert.False(t, money.NewFranc(5).Equals(money.NewDollar(5)))
+	})
 }

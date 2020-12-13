@@ -7,7 +7,7 @@ type Franc struct {
 
 // NewFranc is constructor of Dollar.
 func NewFranc(a int) Franc {
-	return Franc{Money{a}}
+	return Franc{Money{amount: a, name: "Franc"}}
 }
 
 // Times multiplies the amount of the receiver by a multiple of the argument

@@ -365,6 +365,84 @@ func TestMultiCurrencyMoney(t *testing.T) {
 }
 ```
 
+#### 第 7 章 疑念をテストに翻訳する
+
+- 今回の修正とは関係ないが、`Go: Test On Save`Setting をチェックすることで保存時にテストが走るようになった。
+  ![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/110860/c2ce12bb-9c25-542b-62dc-ba9197949a46.png)
+
+##### 第 7 章の振り返り
+
+> - 頭の中にある悩みをテストとして表現した。完璧ではないものの、まずまずのやり方（getClass）でテストを通した。
+> - さらなる設計は、本当に必要になるときまで先延ばしにすることにした
+
+- Money に新しく Name フィールドを追加した
+  - 上記の`getClass`の代替。struct の入れ子の場合、レシーバは常に Money になるので、type の比較ができないため
+
+##### 第 7 章の TODO リスト
+
+> - [ ] \$5+10CHF=$10（レートが 2:1 の場合）
+> - [x] \$5\*2=$10
+> - [x] amount を private にする
+> - [x] Dollar の副作用どうする？
+> - [ ] Money の丸め処理どうする？
+> - [x] equals()
+> - [ ] hashCode()
+> - [ ] null との等価性比較
+> - [ ] 他のオブジェクトとの等価性比較
+> - [x] 5CHF\*2=10CHF
+> - [ ] Dollar と Franc の重複
+> - [x] equals の一般化
+> - [ ] times の一般化
+> - [x] Franc と Dollar を比較する
+> - [ ] 通貨の概念
+
+##### 第 7 章終了時のコード
+
+全文: [github](https://github.com/eyuta/golang-tdd/tree/part1_chapter7)
+
+```money.go
+package money
+
+// Accessor is a accessor of Money
+type Accessor interface {
+	Amount() int
+	Name() string
+}
+
+// Money is a struct that handles money.
+type Money struct {
+	amount int
+	name   string
+}
+
+// Equals checks if the amount of the receiver and the argument are the same
+func (m Money) Equals(a Accessor) bool {
+	return m.Amount() == a.Amount() && m.Name() == a.Name()
+}
+
+// Amount returns amount field
+func (m Money) Amount() int {
+	return m.amount
+}
+
+// Name returns name field
+func (m Money) Name() string {
+	return m.name
+}
+```
+
+```money_test.go
+t.Run("同じ金額のドルとフランが等価ではない", func(t *testing.T) {
+	assert.False(t, money.NewFranc(5).Equals(money.NewDollar(5)))
+})
+```
+
+```dollar.go
+func NewDollar(a int) Dollar {
+	return Dollar{Money{amount: a, name: "Dollar"}}
+}
+```
+
 ### 第 II 部「xUnit」
 
 ### 第 III 部「テスト駆動開発のパターン」
