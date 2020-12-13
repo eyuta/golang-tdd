@@ -1,31 +1,32 @@
-package money
+package money_test
 
 import (
 	"testing"
 
+	"github.com/eyuta/golang-tdd/money"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMultiCurrencyMoney(t *testing.T) {
 	t.Run("ドルの掛け算が可能である", func(t *testing.T) {
-		five := NewDollar(5)
-		assert.Equal(t, NewDollar(10), five.times(2))
-		assert.Equal(t, NewDollar(15), five.times(3))
+		five := money.NewDollar(5)
+		assert.Equal(t, money.NewDollar(10), five.Times(2))
+		assert.Equal(t, money.NewDollar(15), five.Times(3))
 	})
 
 	t.Run("同じ金額のドルが等価である", func(t *testing.T) {
-		assert.True(t, NewDollar(5).equals(NewDollar(5)))
-		assert.False(t, NewDollar(5).equals(NewDollar(6)))
+		assert.True(t, money.NewDollar(5).Equals(money.NewDollar(5)))
+		assert.False(t, money.NewDollar(5).Equals(money.NewDollar(6)))
 	})
 
 	t.Run("フランの掛け算が可能である", func(t *testing.T) {
-		five := NewFranc(5)
-		assert.Equal(t, NewFranc(10), five.times(2))
-		assert.Equal(t, NewFranc(15), five.times(3))
+		five := money.NewFranc(5)
+		assert.Equal(t, money.NewFranc(10), five.Times(2))
+		assert.Equal(t, money.NewFranc(15), five.Times(3))
 	})
 
 	t.Run("同じ金額のフランが等価である", func(t *testing.T) {
-		assert.True(t, NewFranc(5).equals(NewFranc(5)))
-		assert.False(t, NewFranc(5).equals(NewFranc(6)))
+		assert.True(t, money.NewFranc(5).Equals(money.NewFranc(5)))
+		assert.False(t, money.NewFranc(5).Equals(money.NewFranc(6)))
 	})
 }
