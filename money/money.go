@@ -41,9 +41,17 @@ func (m Money) Times(multiplier int) Money {
 	return NewMoney(m.amount*multiplier, m.currency)
 }
 
-// Plus adds an argument to the amount of receiver
+// Plus adds an argument to the amount of receiver.
 func (m Money) Plus(added Money) Expression {
-	return NewMoney(m.amount+added.amount, m.currency)
+	return Sum{
+		Augend: m,
+		Added:  added,
+	}
+}
+
+// Reduce applies the exchange rate to receiver.
+func (m Money) Reduce(to string) Money {
+	return m
 }
 
 // Equals checks if the amount of the receiver and the argument are the same

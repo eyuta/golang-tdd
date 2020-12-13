@@ -745,10 +745,101 @@ t.Run("ドル同士の足し算が可能である", func(t *testing.T) {
 })
 ```
 
+#### 第 13 章 実装を導くテスト
+
+##### 第 13 章の振り返り
+
+> - 重複を除去出来ていないので、TODO リストの項目を「済」にしなかった。
+> - 実装の着想を得るためにさらに先に進むことにした。
+> - 速やかに実装を行った(Sum のコンストラクタ)
+> - キャストを使って 1 カ所で実装した後で、テストが通る馬で本来あるべき場所にコードを移した。
+> - ポリモフィズムを使って、明示的なクラスチェックを置き換えた。
+
+##### 第 13 章の TODO リスト
+
+> - [ ] \$5+10CHF=$10（レートが 2:1 の場合）
+> - [ ] $5 + $5 = $10
+> - [ ] $5 + $5 が Money を返す
+> - [x] Bank.reduce(Money)
+> - [ ] Money を変換して換算を行う
+> - [ ] Reduce(Bank, String)
+
+##### 第 13 章終了時のコード
+
+全文: [github](https://github.com/eyuta/golang-tdd/tree/part1_chapter13)
+
+```maoney_test.go
+t.Run("ドル同士の足し算が可能である", func(t *testing.T) {
+	five := money.NewDollar(5)
+	result := five.Plus(five)
+	sum := result.(money.Sum)
+	assert.Equal(t, five, sum.Augend)
+	assert.Equal(t, five, sum.Added)
+})
+t.Run("Sumで足されるお金の通貨が同じなら、足し算の結果が同じになる", func(t *testing.T) {
+	sum := money.Sum{
+		Augend: money.NewDollar(3),
+		Added:  money.NewDollar(4),
+	}
+	bank := money.Bank{}
+	result := bank.Reduce(sum, "USD")
+	assert.Equal(t, money.NewDollar(7), result)
+})
+t.Run("moneyをreduceしても、reduceに渡す通貨が同じであれば同じ値が返る", func(t *testing.T) {
+	bank := money.Bank{}
+	result := bank.Reduce(money.NewDollar(1), "USD")
+	assert.Equal(t, money.NewDollar(1), result)
+})
+```
+
+```money.go
+// Plus adds an argument to the amount of receiver.
+func (m Money) Plus(added Money) Expression {
+	return Sum{
+		Augend: m,
+		Added:  added,
+	}
+}
+
+// Reduce applies the exchange rate to receiver.
+func (m Money) Reduce(to string) Money {
+	return m
+}
+```
+
+```bank.go
+// Reduce applies the exchange rate to the argument expression
+func (b Bank) Reduce(source Expression, to string) Money {
+	return source.Reduce(to)
+}
+```
+
+```expression.go
+// Expression shows the formula of currency (regardless of the difference in exchange rate)
+type Expression interface {
+	Reduce(string) Money
+```
+
+```sum.go
+package money
+
+// Sum 合計は通貨の加算を行います
+type Sum struct {
+	Augend Money
+	Added  Money
+}
+
+// Reduce applies the exchange rate to the result of the addition
+func (s Sum) Reduce(to string) Money {
+	amount := s.Augend.amount + s.Added.amount
+	return NewMoney(amount, to)
+}
+```
+
 ### 第 II 部「xUnit」
 
 ### 第 III 部「テスト駆動開発のパターン」
 
 ## 参考文献
 
-- [ＫｅｎｔＢｅｃｋ.テスト駆動開発(Kindle の位置 No.200-201).Kindle 版](https://www.amazon.co.jp/dp/B077D2L69C/ref=dp-kindle-redirect?_encoding=UTF8&btkr=1)
+- [ＫｅｎｔＢｅｃｋ. テスト駆動開発 Kindle 版](https://www.amazon.co.jp/dp/B077D2L69C/ref=dp-kindle-redirect?_encoding=UTF8&btkr=1)

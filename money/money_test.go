@@ -39,4 +39,25 @@ func TestMultiCurrencyMoney(t *testing.T) {
 		reduced := bank.Reduce(sum, "USD")
 		assert.Equal(t, money.NewDollar(10), reduced)
 	})
+	t.Run("ドル同士の足し算が可能である", func(t *testing.T) {
+		five := money.NewDollar(5)
+		result := five.Plus(five)
+		sum := result.(money.Sum)
+		assert.Equal(t, five, sum.Augend)
+		assert.Equal(t, five, sum.Added)
+	})
+	t.Run("Sumで足されるお金の通貨が同じなら、足し算の結果が同じになる", func(t *testing.T) {
+		sum := money.Sum{
+			Augend: money.NewDollar(3),
+			Added:  money.NewDollar(4),
+		}
+		bank := money.Bank{}
+		result := bank.Reduce(sum, "USD")
+		assert.Equal(t, money.NewDollar(7), result)
+	})
+	t.Run("moneyをreduceしても、reduceに渡す通貨が同じであれば同じ値が返る", func(t *testing.T) {
+		bank := money.Bank{}
+		result := bank.Reduce(money.NewDollar(1), "USD")
+		assert.Equal(t, money.NewDollar(1), result)
+	})
 }
