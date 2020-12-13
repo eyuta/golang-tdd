@@ -1,13 +1,18 @@
 package money
 
-// Sum 合計は通貨の加算を行います
+// Sum adds currency
 type Sum struct {
-	Augend Money
-	Added  Money
+	Augend Expression
+	Added  Expression
 }
 
 // Reduce applies the exchange rate to the result of the addition
 func (s Sum) Reduce(b Bank, to string) Money {
-	amount := s.Augend.amount + s.Added.amount
+	amount := s.Augend.Reduce(b, to).amount + s.Added.Reduce(b, to).amount
 	return NewMoney(amount, to)
+}
+
+// Plus adds an argument to the amount of receiver.
+func (s Sum) Plus(added Expression) Expression {
+	return Sum{}
 }

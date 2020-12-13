@@ -37,12 +37,12 @@ func NewFranc(a int) Money {
 }
 
 // Times multiplies the amount of the receiver by a multiple of the argument
-func (m Money) Times(multiplier int) Money {
+func (m Money) Times(multiplier int) Expression {
 	return NewMoney(m.amount*multiplier, m.currency)
 }
 
 // Plus adds an argument to the amount of receiver.
-func (m Money) Plus(added Money) Expression {
+func (m Money) Plus(added Expression) Expression {
 	return Sum{
 		Augend: m,
 		Added:  added,

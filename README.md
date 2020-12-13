@@ -876,6 +876,31 @@ fmt.Println(reflect.DeepEqual(s1, s2)) // true
 fmt.Println(s1 == s2) // invalid operation: s1 == s2 (struct containing []int cannot be compared)
 ```
 
+ちなみに、`assert.Equal`も内部で`reflect.DeepEqual`を使用している。
+
+```go
+// This function does no assertion of any kind.
+func ObjectsAreEqual(expected, actual interface{}) bool {
+	if expected == nil || actual == nil {
+		return expected == actual
+	}
+
+	exp, ok := expected.([]byte)
+	if !ok {
+		return reflect.DeepEqual(expected, actual) // ここ
+	}
+
+	act, ok := actual.([]byte)
+	if !ok {
+		return false
+	}
+	if exp == nil || act == nil {
+		return exp == nil && act == nil
+	}
+	return bytes.Equal(exp, act)
+}
+```
+
 ##### 第 14 章の TODO リスト
 
 > - [ ] \$5+10CHF=$10（レートが 2:1 の場合）
@@ -960,6 +985,78 @@ type Expression interface {
 func (s Sum) Reduce(b Bank, to string) Money {
 	amount := s.Augend.amount + s.Added.amount
 	return NewMoney(amount, to)
+}
+```
+
+#### 第 15 章 テスト任せとコンパイラ任せ
+
+##### 第 15 章の振り返り
+
+> - こうなったら良いというテストを書き、次にまず一歩で動かせるところまでそのテストを少し後退させた。
+> - 一般化(より抽象度の高い型で宣言する)作業を、末端から開始して頂点(テストケース)まで到達させた。
+> - 変更の際にコンパイラに従い(fiveBucks 変数の Expression 型への変更)、変更の連鎖を 1 つずつ仕留めた(Expression インターフェースへの Plus メソッドの追加等)。
+
+どうでもいいが、Dollar の代わりに Bucks が使われることを初めて知った。
+
+##### 第 15 章の TODO リスト
+
+> - [x] \$5+10CHF=$10（レートが 2:1 の場合）
+> - [x] $5 + $5 = $10
+> - [ ] $5 + $5 が Money を返す
+> - [x] Bank.reduce(Money)
+> - [x] Money を変換して換算を行う
+> - [x] Reduce(Bank, String)
+> - [ ] Sum.Plus
+> - [ ] Expression.Times
+
+##### 第 15 章終了時のコード
+
+全文: [github](https://github.com/eyuta/golang-tdd/tree/part1_chapter15)
+
+```money_test.go
+t.Run("$5 + 10 CHF = $10 (レートが2:1の場合)", func(t *testing.T) {
+	fiveBucks := money.Expression(money.NewDollar(5))
+	tenFrancs := money.Expression(money.NewFranc(10))
+	bank := money.NewBank()
+	bank.AddRate("CHF", "USD", 2)
+	result := bank.Reduce(fiveBucks.Plus(tenFrancs), "USD")
+	assert.Equal(t, money.NewDollar(10), result)
+})
+```
+
+```money.go
+// Times multiplies the amount of the receiver by a multiple of the argument
+func (m Money) Times(multiplier int) Expression {
+	return NewMoney(m.amount*multiplier, m.currency)
+}
+
+// Plus adds an argument to the amount of receiver.
+func (m Money) Plus(added Expression) Expression {
+	return Sum{
+		Augend: m,
+		Added:  added,
+	}
+}
+```
+
+```expression.go
+// Expression shows the formula of currency (regardless of the difference in exchange rate)
+type Expression interface {
+	Reduce(Bank, string) Money
+	Plus(Expression) Expression
+}
+```
+
+```sum.go
+// Reduce applies the exchange rate to the result of the addition
+func (s Sum) Reduce(b Bank, to string) Money {
+	amount := s.Augend.Reduce(b, to).amount + s.Added.Reduce(b, to).amount
+	return NewMoney(amount, to)
+}
+
+// Plus adds an argument to the amount of receiver.
+func (s Sum) Plus(added Expression) Expression {
+	return Sum{}
 }
 ```
 

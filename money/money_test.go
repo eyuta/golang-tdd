@@ -66,8 +66,16 @@ func TestMultiCurrencyMoney(t *testing.T) {
 		result := bank.Reduce(money.NewFranc(2), "USD")
 		assert.Equal(t, money.NewDollar(1), result)
 	})
-	t.Run("同量テスト", func(t *testing.T) {
+	t.Run("通貨が同じ場合はレートが1:1になる", func(t *testing.T) {
 		bank := money.NewBank()
 		assert.Equal(t, 1, bank.Rate("USD", "USD"))
+	})
+	t.Run("$5 + 10 CHF = $10 (レートが2:1の場合)", func(t *testing.T) {
+		fiveBucks := money.Expression(money.NewDollar(5))
+		tenFrancs := money.Expression(money.NewFranc(10))
+		bank := money.NewBank()
+		bank.AddRate("CHF", "USD", 2)
+		result := bank.Reduce(fiveBucks.Plus(tenFrancs), "USD")
+		assert.Equal(t, money.NewDollar(10), result)
 	})
 }
