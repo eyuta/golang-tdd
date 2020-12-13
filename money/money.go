@@ -38,10 +38,12 @@ func NewFranc(a int) Money {
 
 // Times multiplies the amount of the receiver by a multiple of the argument
 func (m Money) Times(multiplier int) Money {
-	return Money{
-		amount:   m.amount * multiplier,
-		currency: m.currency,
-	}
+	return NewMoney(m.amount*multiplier, m.currency)
+}
+
+// Plus adds an argument to the amount of receiver
+func (m Money) Plus(added Money) Expression {
+	return NewMoney(m.amount+added.amount, m.currency)
 }
 
 // Equals checks if the amount of the receiver and the argument are the same

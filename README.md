@@ -688,6 +688,63 @@ dollar.go, franc.go,ファイルを削除した。
 
 全文: [github](https://github.com/eyuta/golang-tdd/tree/part1_chapter11)
 
+#### 第 12 章 設計とメタファー
+
+##### 第 12 章の振り返り
+
+> - 大きいテスト($5 + 10 CHF)を分解して。進み具合がわかる小さいテスト($5+$5)を作成した。
+> - これから行う計算のためのメタファーについて深く考えた。
+> - テストがコンパイルできるところまで早足で進んだ。
+> - テストを通した。
+> - 本当の実装を導くためのリファクタリングを楽しみにしつつ、少し不安も感じている。
+
+##### 第 12 章の TODO リスト
+
+> - [ ] \$5+10CHF=$10（レートが 2:1 の場合）
+> - [ ] $5 + $5 = $10
+
+##### 第 12 章終了時のコード
+
+全文: [github](https://github.com/eyuta/golang-tdd/tree/part1_chapter12)
+
+```money.go
+// Plus adds an argument to the amount of receiver
+func (m Money) Plus(added Money) Expression {
+	return NewMoney(m.amount+added.amount, m.currency)
+}
+```
+
+```bank.go
+package money
+
+// Bank calculates using exchange rates
+type Bank struct {
+}
+
+// Reduce applies the exchange rate to the argument expression
+func (b Bank) Reduce(source Expression, to string) Money {
+	return NewDollar(10)
+}
+```
+
+```expression.go
+package money
+
+// Expression shows the formula of currency (regardless of the difference in exchange rate)
+type Expression interface {
+}
+```
+
+```money_test.go
+t.Run("ドル同士の足し算が可能である", func(t *testing.T) {
+	five := money.NewDollar(5)
+	sum := five.Plus(five)
+	bank := money.Bank{}
+	reduced := bank.Reduce(sum, "USD")
+	assert.Equal(t, money.NewDollar(10), reduced)
+})
+```
+
 ### 第 II 部「xUnit」
 
 ### 第 III 部「テスト駆動開発のパターン」

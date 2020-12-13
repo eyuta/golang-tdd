@@ -32,4 +32,11 @@ func TestMultiCurrencyMoney(t *testing.T) {
 		assert.Equal(t, "USD", money.NewDollar(1).Currency())
 		assert.Equal(t, "CHF", money.NewFranc(1).Currency())
 	})
+	t.Run("ドル同士の足し算が可能である", func(t *testing.T) {
+		five := money.NewDollar(5)
+		sum := five.Plus(five)
+		bank := money.Bank{}
+		reduced := bank.Reduce(sum, "USD")
+		assert.Equal(t, money.NewDollar(10), reduced)
+	})
 }
