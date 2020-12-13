@@ -836,6 +836,133 @@ func (s Sum) Reduce(to string) Money {
 }
 ```
 
+#### 第 14 章 学習用テストと回帰テスト
+
+##### 第 14 章の振り返り
+
+> - 必要になると予想されたパラメータ追加をすぐに行った。
+> - コードとテストの間のデータ重複をくくりだした。
+> - 内部実装で使うためだけのヘルパークラスを個別のテスト無しで作成した。
+> - リファクタリング中にミスを犯したが、問題を再現するテストを追加して、着実に前進した。
+
+今回、本にあるような Pair.go ファイルを作成せず、Pair struct のみ Bank ファイルに記述した。
+
+Java オブジェクトの`equals`による比較は等値比較だが、Go の struct の`==`による比較は等価比較になるため。
+
+ただし、struct に map や slice といった等価比較できないフィールドが存在する場合は、コンパイル時にエラーになる。
+
+そういった場合は`reflect.DeepEqual`を使って比較を行う
+
+参考:[How to compare if two structs, slices or maps are equal?](https://stackoverflow.com/questions/24534072/how-to-compare-if-two-structs-slices-or-maps-are-equal)
+
+```go
+type s struct {
+	a int
+}
+s1 := s{1}
+s2 := s{1}
+fmt.Println(s1 == s2) // true
+```
+
+```go
+
+type s struct {
+	a int
+	b []int
+}
+s1 := s{1, make([]int, 0)}
+s2 := s{1, make([]int, 0)}
+fmt.Println(reflect.DeepEqual(s1, s2)) // true
+fmt.Println(s1 == s2) // invalid operation: s1 == s2 (struct containing []int cannot be compared)
+```
+
+##### 第 14 章の TODO リスト
+
+> - [ ] \$5+10CHF=$10（レートが 2:1 の場合）
+> - [x] $5 + $5 = $10
+> - [ ] $5 + $5 が Money を返す
+> - [x] Bank.reduce(Money)
+> - [x] Money を変換して換算を行う
+> - [x] Reduce(Bank, String)
+
+##### 第 14 章終了時のコード
+
+全文: [github](https://github.com/eyuta/golang-tdd/tree/part1_chapter14)
+
+```money_test.go
+t.Run("1 CHF = $2", func(t *testing.T) {
+	bank := money.NewBank()
+	bank.AddRate("CHF", "USD", 2)
+	result := bank.Reduce(money.NewFranc(2), "USD")
+	assert.Equal(t, money.NewDollar(1), result)
+})
+t.Run("同量テスト", func(t *testing.T) {
+	bank := money.NewBank()
+	assert.Equal(t, 1, bank.Rate("USD", "USD"))
+})
+```
+
+```money.go
+// Reduce applies the exchange rate to receiver.
+func (m Money) Reduce(b Bank, to string) Money {
+	rate := b.Rate(m.currency, to)
+	return NewMoney(m.amount/rate, to)
+}
+```
+
+```bank.go
+// Bank calculates using exchange rates
+type Bank struct {
+	rates map[Pair]int
+}
+
+// Pair associates two currencies
+type Pair struct {
+	from, to string
+}
+
+// NewBank is a constructor of Bank
+func NewBank() Bank {
+	b := Bank{}
+	b.rates = make(map[Pair]int)
+	return b
+}
+
+// Reduce applies the exchange rate to the argument expression
+func (b *Bank) Reduce(source Expression, to string) Money {
+	return source.Reduce(*b, to)
+}
+
+// AddRate adds exchange rate
+func (b *Bank) AddRate(from, to string, rate int) {
+	b.rates[Pair{from: from, to: to}] = rate
+}
+
+// Rate adds exchange rate
+func (b *Bank) Rate(from, to string) int {
+	if from == to {
+		return 1
+	}
+	p := Pair{from: from, to: to}
+	return b.rates[p]
+}
+```
+
+```expression.go
+// Expression shows the formula of currency (regardless of the difference in exchange rate)
+type Expression interface {
+	Reduce(Bank, string) Money
+}
+```
+
+```sum.go
+// Reduce applies the exchange rate to the result of the addition
+func (s Sum) Reduce(b Bank, to string) Money {
+	amount := s.Augend.amount + s.Added.amount
+	return NewMoney(amount, to)
+}
+```
+
 ### 第 II 部「xUnit」
 
 ### 第 III 部「テスト駆動開発のパターン」

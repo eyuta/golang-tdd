@@ -7,7 +7,7 @@ type Sum struct {
 }
 
 // Reduce applies the exchange rate to the result of the addition
-func (s Sum) Reduce(to string) Money {
+func (s Sum) Reduce(b Bank, to string) Money {
 	amount := s.Augend.amount + s.Added.amount
 	return NewMoney(amount, to)
 }

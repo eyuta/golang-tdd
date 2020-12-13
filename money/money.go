@@ -50,8 +50,9 @@ func (m Money) Plus(added Money) Expression {
 }
 
 // Reduce applies the exchange rate to receiver.
-func (m Money) Reduce(to string) Money {
-	return m
+func (m Money) Reduce(b Bank, to string) Money {
+	rate := b.Rate(m.currency, to)
+	return NewMoney(m.amount/rate, to)
 }
 
 // Equals checks if the amount of the receiver and the argument are the same
