@@ -443,6 +443,104 @@ func NewDollar(a int) Dollar {
 }
 ```
 
+#### 第 8 章 実装を隠す
+
+##### 第 8 章の振り返り
+
+> - 重複を除去できる状態に一歩近づけるために、Dollar と Franc にある 2 つの times メソッドのシグニチャを合わせた。
+> - Factory Method パターンを導入して、テストコードから 2 つのサブクラスの存在を隠した。
+> - サブクラスを隠した結果、いくつかのテストが冗長なものになったことに気がついたが、いまはそのままにしておいた。
+
+- Go には抽象クラスの概念が無いため、Times メソッドについては一足先に実装もろとも Money に移行した
+- それにより、Dollar, Franc の 2 つの構造体が使われなくなったが、一旦取っておくことにする
+
+##### 第 8 章の TODO リスト
+
+> - [ ] \$5+10CHF=$10（レートが 2:1 の場合）
+> - [x] \$5\*2=$10
+> - [x] amount を private にする
+> - [x] Dollar の副作用どうする？
+> - [ ] Money の丸め処理どうする？
+> - [x] equals()
+> - [ ] hashCode()
+> - [ ] null との等価性比較
+> - [ ] 他のオブジェクトとの等価性比較
+> - [x] 5CHF\*2=10CHF
+> - [ ] Dollar と Franc の重複
+> - [x] equals の一般化
+> - [ ] times の一般化
+> - [x] Franc と Dollar を比較する
+> - [ ] 通貨の概念
+> - [ ] testFrancMultiplication を削除する？
+
+##### 第 8 章終了時のコード
+
+全文: [github](https://github.com/eyuta/golang-tdd/tree/part1_chapter8)
+
+```money.go
+package money
+
+// Accessor is a accessor of Money
+type Accessor interface {
+	Amount() int
+	Name() string
+}
+
+// Money is a struct that handles money.
+type Money struct {
+	amount int
+	name   string
+}
+
+// NewDollar is constructor of Dollar.
+func NewDollar(a int) Money {
+	return Money{
+		amount: a,
+		name:   "Dollar",
+	}
+}
+
+// NewFranc is constructor of Dollar.
+func NewFranc(a int) Money {
+	return Money{
+		amount: a,
+		name:   "Franc",
+	}
+}
+
+// Times multiplies the amount of the receiver by a multiple of the argument
+func (m Money) Times(multiplier int) Money {
+	return Money{
+		amount: m.amount * multiplier,
+		name:   m.name,
+	}
+}
+
+// Equals checks if the amount of the receiver and the argument are the same
+func (m Money) Equals(a Accessor) bool {
+	return m.amount == a.Amount() && m.name == a.Name()
+}
+
+// Amount returns amount field
+func (m Money) Amount() int {
+	return m.amount
+}
+
+// Name returns name field
+func (m Money) Name() string {
+	return m.name
+}
+```
+
+```dollar.go
+package money
+
+// Dollar is a struct that handles dollar money.
+type Dollar struct {
+	Money
+}
+```
+
 ### 第 II 部「xUnit」
 
 ### 第 III 部「テスト駆動開発のパターン」
