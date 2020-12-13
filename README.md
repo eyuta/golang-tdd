@@ -468,7 +468,7 @@ func NewDollar(a int) Dollar {
 > - [x] 5CHF\*2=10CHF
 > - [ ] Dollar と Franc の重複
 > - [x] equals の一般化
-> - [ ] times の一般化
+> - [x] times の一般化
 > - [x] Franc と Dollar を比較する
 > - [ ] 通貨の概念
 > - [ ] testFrancMultiplication を削除する？
@@ -553,6 +553,25 @@ type Dollar struct {
 
 currency field は第 7 章で作成した name field を currency に改名しただけになる
 
+##### 第 9 章の TODO リスト
+
+> - [ ] \$5+10CHF=$10（レートが 2:1 の場合）
+> - [x] \$5\*2=$10
+> - [x] amount を private にする
+> - [x] Dollar の副作用どうする？
+> - [ ] Money の丸め処理どうする？
+> - [x] equals()
+> - [ ] hashCode()
+> - [ ] null との等価性比較
+> - [ ] 他のオブジェクトとの等価性比較
+> - [x] 5CHF\*2=10CHF
+> - [ ] Dollar と Franc の重複
+> - [x] equals の一般化
+> - [x] times の一般化
+> - [x] Franc と Dollar を比較する
+> - [x] 通貨の概念
+> - [ ] testFrancMultiplication を削除する？
+
 ##### 第 9 章終了時のコード
 
 全文: [github](https://github.com/eyuta/golang-tdd/tree/part1_chapter9)
@@ -621,6 +640,21 @@ t.Run("通貨テスト", func(t *testing.T) {
 })
 ```
 
+#### 第 10 章 テストに聞いてみる
+
+##### 第 10 章の振り返り
+
+times メソッドについては既に共通化しているため、ログ出力用の String メソッドのみ実装した。
+
+##### 第 10 章終了時のコード
+
+全文: [github](https://github.com/eyuta/golang-tdd/tree/part1_chapter10)
+
+```money.go
+func (m Money) String() string {
+	return fmt.Sprintf("{Amount: %v, Currency: %v}", m.amount, m.currency)
+}
+```
 ### 第 II 部「xUnit」
 
 ### 第 III 部「テスト駆動開発のパターン」

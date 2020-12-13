@@ -1,5 +1,7 @@
 package money
 
+import "fmt"
+
 // Accessor is a accessor of Money
 type Accessor interface {
 	Amount() int
@@ -10,6 +12,10 @@ type Accessor interface {
 type Money struct {
 	amount   int
 	currency string
+}
+
+func (m Money) String() string {
+	return fmt.Sprintf("{Amount: %v, Currency: %v}", m.amount, m.currency)
 }
 
 // NewMoney is constructor of Money.
