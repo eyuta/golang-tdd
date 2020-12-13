@@ -10,6 +10,7 @@ func NewDollar(a int) Dollar {
 	return Dollar{Money{a}}
 }
 
-func (d Dollar) times(multiplier int) Dollar {
+// Times multiplies the amount of the receiver by a multiple of the argument
+func (d Dollar) Times(multiplier int) Dollar {
 	return NewDollar(d.amount * multiplier)
 }

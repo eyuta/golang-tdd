@@ -1,6 +1,5 @@
 package money
 
-
 // Franc is a struct that handles franc money.
 type Franc struct {
 	Money
@@ -11,7 +10,7 @@ func NewFranc(a int) Franc {
 	return Franc{Money{a}}
 }
 
-func (f Franc) times(multiplier int) Franc {
-	fmt.Println(multiplier)
+// Times multiplies the amount of the receiver by a multiple of the argument
+func (f Franc) Times(multiplier int) Franc {
 	return NewFranc(f.amount * multiplier)
 }

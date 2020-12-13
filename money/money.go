@@ -10,7 +10,8 @@ type Money struct {
 	amount int
 }
 
-func (m Money) equals(a AmountGetter) bool {
+// Equals checks if the amount of the receiver and the argument are the same
+func (m Money) Equals(a AmountGetter) bool {
 	return m.getAmount() == a.getAmount()
 }
 
