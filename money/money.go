@@ -12,9 +12,33 @@ type Money struct {
 	name   string
 }
 
+// NewDollar is constructor of Dollar.
+func NewDollar(a int) Money {
+	return Money{
+		amount: a,
+		name:   "Dollar",
+	}
+}
+
+// NewFranc is constructor of Dollar.
+func NewFranc(a int) Money {
+	return Money{
+		amount: a,
+		name:   "Franc",
+	}
+}
+
+// Times multiplies the amount of the receiver by a multiple of the argument
+func (m Money) Times(multiplier int) Money {
+	return Money{
+		amount: m.amount * multiplier,
+		name:   m.name,
+	}
+}
+
 // Equals checks if the amount of the receiver and the argument are the same
 func (m Money) Equals(a Accessor) bool {
-	return m.Amount() == a.Amount() && m.Name() == a.Name()
+	return m.amount == a.Amount() && m.name == a.Name()
 }
 
 // Amount returns amount field
