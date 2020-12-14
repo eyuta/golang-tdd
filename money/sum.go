@@ -14,5 +14,16 @@ func (s Sum) Reduce(b Bank, to string) Money {
 
 // Plus adds an argument to the amount of receiver.
 func (s Sum) Plus(added Expression) Expression {
-	return Sum{}
+	return Sum{
+		Augend: s,
+		Added:  added,
+	}
+}
+
+// Times multiplies the amount of the receiver by a multiple of the argument
+func (s Sum) Times(multiplier int) Expression {
+	return Sum{
+		Augend: s.Augend.Times(multiplier),
+		Added:  s.Added.Times(multiplier),
+	}
 }

@@ -1,20 +1,20 @@
 # テスト駆動開発を Go 言語で取り組んでみる
 
-#
-
 ## はじめに
 
-先日、t_wada さんが弊社に公演に来てくださいました。
-それに先駆け、以前購入した t_wada さんが訳された[テスト駆動開発](https://www.amazon.co.jp/dp/B077D2L69C/ref=dp-kindle-redirect?_encoding=UTF8&btkr=1)を、現在学習中の Go 言語で取り組んでみました。
+先日、[t_wada](https://twitter.com/t_wada) さんが[弊社に公演](https://twitter.com/t_wada/status/1333573001795706882)に来てくださいました。
+
+それに触発され、t_wada さんが訳された[テスト駆動開発](https://www.amazon.co.jp/dp/B077D2L69C/ref=dp-kindle-redirect?_encoding=UTF8&btkr=1)を、現在学習中の Go 言語で取り組んでみました。
+
 本記事中の引用は、特に断りがない限りこの本の引用になります。
 
 ## リポジトリ
 
 <https://github.com/eyuta/golang-tdd>
 
-## 目的
-
 ## 前提
+
+筆者の Go の習熟度は[A Tour of Go](https://go-tour-jp.appspot.com/welcome/1)を終了したくらいです。
 
 ### バージョン
 
@@ -1057,6 +1057,88 @@ func (s Sum) Reduce(b Bank, to string) Money {
 // Plus adds an argument to the amount of receiver.
 func (s Sum) Plus(added Expression) Expression {
 	return Sum{}
+}
+```
+
+#### 第 16 章 将来の読み手を考えたテスト
+
+##### 第 16 章の振り返り
+
+> - 将来読む人のことを考えながらテストを書いた
+> - これまえのプログラミングスタイルと TDD との比較を自分自身で行うことが大事だと伝えた。
+> - 再び連鎖的に波及する定義変更を行い、コンパイラに導かれながら修正を行った。
+> - 最後に簡単な実験を行い、うまく機能しないと分かっていたので破棄して引き返した。
+
+文中で、
+
+> テストを書くのは、(中略) いま考えていることを将来の仲間に伝えるロゼッタストーンの役割も担ってほしいからだ。
+
+とあるが、この場合のロゼッタストーンとは`one that gives a clue to understanding`、日本語で`理解の手がかりを与えるもの` という意味があるそうだ。
+
+参考: [Rosetta stone](https://www.merriam-webster.com/dictionary/Rosetta%20stone)
+
+元々はエジプトのロゼッタで発見された古代の石碑のこと。
+
+##### 第 16 章の TODO リスト
+
+> - [x] \$5+10CHF=$10（レートが 2:1 の場合）
+> - [x] $5 + $5 = $10
+> - [x] $5 + $5 が Money を返す
+> - [x] Bank.reduce(Money)
+> - [x] Money を変換して換算を行う
+> - [x] Reduce(Bank, String)
+> - [x] Sum.Plus
+> - [x] Expression.Times
+
+##### 第 16 章終了時のコード
+
+全文: [github](https://github.com/eyuta/golang-tdd/tree/part1_chapter16)
+
+```money_test.go
+t.Run("$5 + 10 CHF + $5 = $15 をSum structを使って行う", func(t *testing.T) {
+	fiveBucks := money.Expression(money.NewDollar(5))
+	tenFrancs := money.Expression(money.NewFranc(10))
+	bank := money.NewBank()
+	bank.AddRate("CHF", "USD", 2)
+	sum := money.Sum{Augend: fiveBucks, Added: tenFrancs}.Plus(fiveBucks)
+	result := bank.Reduce(sum, "USD")
+	assert.Equal(t, money.NewDollar(15), result)
+})
+t.Run("($5 + 10 CHF) * 2 = $20 をSum structを使って行う", func(t *testing.T) {
+	fiveBucks := money.Expression(money.NewDollar(5))
+	tenFrancs := money.Expression(money.NewFranc(10))
+	bank := money.NewBank()
+	bank.AddRate("CHF", "USD", 2)
+	sum := money.Sum{Augend: fiveBucks, Added: tenFrancs}.Times(2)
+	result := bank.Reduce(sum, "USD")
+	assert.Equal(t, money.NewDollar(20), result)
+})
+```
+
+```expression.go
+// Expression shows the formula of currency (regardless of the difference in exchange rate)
+type Expression interface {
+	Reduce(Bank, string) Money
+	Plus(Expression) Expression
+	Times(int) Expression
+}
+```
+
+```sum.go
+// Plus adds an argument to the amount of receiver.
+func (s Sum) Plus(added Expression) Expression {
+	return Sum{
+		Augend: s,
+		Added:  added,
+	}
+}
+
+// Times multiplies the amount of the receiver by a multiple of the argument
+func (s Sum) Times(multiplier int) Expression {
+	return Sum{
+		Augend: s.Augend.Times(multiplier),
+		Added:  s.Added.Times(multiplier),
+	}
 }
 ```
 

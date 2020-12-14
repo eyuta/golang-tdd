@@ -78,4 +78,22 @@ func TestMultiCurrencyMoney(t *testing.T) {
 		result := bank.Reduce(fiveBucks.Plus(tenFrancs), "USD")
 		assert.Equal(t, money.NewDollar(10), result)
 	})
+	t.Run("$5 + 10 CHF + $5 = $15 をSum structを使って行う", func(t *testing.T) {
+		fiveBucks := money.Expression(money.NewDollar(5))
+		tenFrancs := money.Expression(money.NewFranc(10))
+		bank := money.NewBank()
+		bank.AddRate("CHF", "USD", 2)
+		sum := money.Sum{Augend: fiveBucks, Added: tenFrancs}.Plus(fiveBucks)
+		result := bank.Reduce(sum, "USD")
+		assert.Equal(t, money.NewDollar(15), result)
+	})
+	t.Run("($5 + 10 CHF) * 2 = $20 をSum structを使って行う", func(t *testing.T) {
+		fiveBucks := money.Expression(money.NewDollar(5))
+		tenFrancs := money.Expression(money.NewFranc(10))
+		bank := money.NewBank()
+		bank.AddRate("CHF", "USD", 2)
+		sum := money.Sum{Augend: fiveBucks, Added: tenFrancs}.Times(2)
+		result := bank.Reduce(sum, "USD")
+		assert.Equal(t, money.NewDollar(20), result)
+	})
 }
